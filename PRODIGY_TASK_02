@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stopwatch">
+        <h1>Stopwatch</h1>
+        <div id="display">00:00:00</div>
+        <div class="controls">
+            <button id="start">Start</button>
+            <button id="pause">Pause</button>
+            <button id="reset">Reset</button>
+            <button id="lap">Lap</button>
+        </div>
+        <div class="laps">
+            <h2>Lap Times</h2>
+            <ul id="lapList"></ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.stopwatch {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#display {
+    font-size: 48px;
+    margin: 20px 0;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.laps {
+    margin-top: 20px;
+}
+
+.laps ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+let startTime;
+let updatedTime;
+let difference;
+let running = false;
+let interval;
+const display = document.getElementById("display");
+const lapList = document.getElementById("lapList");
+
+function startTimer() {
+    if (!running) {
+        startTime = new Date().getTime() - (difference || 0);
+        interval = setInterval(updateTime, 10);
+        running = true;
+    }
+}
+
+function updateTime() {
+    updatedTime = new Date().getTime();
+    difference = updatedTime - startTime;
+
+    let hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    let milliseconds = Math.floor((difference % 1000) / 10);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    display.innerHTML = `${hours}:${minutes}:${seconds}`;
+}
+
+function pauseTimer() {
+    clearInterval(interval);
+    running = false;
+}
+
+function resetTimer() {
+    clearInterval(interval);
+    running = false;
+    difference = 0;
+    display.innerHTML = "00:00:00";
+    lapList.innerHTML = ""; // Clear lap times
+}
+
+function recordLap() {
+    if (running) {
+        const lapTime = display.innerHTML;
+        const lapItem = document.createElement("li");
+        lapItem.textContent = lapTime;
+        lapList.appendChild(lapItem);
+    }
+}
+
+// Event Listeners
+document.getElementById("start").addEventListener("click", startTimer);
+document.getElementById("pause").addEventListener("click", pauseTimer);
+document.getElementById("reset").addEventListener("click", resetTimer);
+document.getElementById("lap").addEventListener("click", recordLap);
